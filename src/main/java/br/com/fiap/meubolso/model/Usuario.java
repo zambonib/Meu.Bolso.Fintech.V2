@@ -1,4 +1,4 @@
-package br.com.fiap.meubolso;
+package br.com.fiap.meubolso.model;
 import java.time.LocalDate;
 import java.time.Period;
 //Classe inicial de identificação de usuário

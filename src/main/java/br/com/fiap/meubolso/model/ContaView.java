@@ -1,4 +1,4 @@
-package br.com.fiap.meubolso;
+package br.com.fiap.meubolso.model;
 
 import java.util.Scanner;
 import java.time.LocalDate;

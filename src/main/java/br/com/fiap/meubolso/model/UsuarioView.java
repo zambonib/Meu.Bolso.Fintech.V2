@@ -1,7 +1,5 @@
-package br.com.fiap.meubolso;
+package br.com.fiap.meubolso.model;
 
-import br.com.fiap.meubolso.Usuario;
-import br.com.fiap.meubolso.Endereco;
 import java.time.LocalDate;
 import java.util.Scanner;
 
