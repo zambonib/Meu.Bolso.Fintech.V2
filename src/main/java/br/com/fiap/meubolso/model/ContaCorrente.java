@@ -10,10 +10,13 @@ public class ContaCorrente extends Conta {
         super();
     }
 
-    // Construtor Refatorado: removi o parâmetro saldo.
-    // O limitedebito é passado para o super() como saldo inicial.
-    public ContaCorrente(int id, String numeroConta, String agencia, LocalDate dataCriacao, double limitedebito, double limitecredito) {
-        super(id, numeroConta, agencia, limitedebito, dataCriacao);
+    // Construtor Corrigido para bater com a classe Conta
+    public ContaCorrente(int id, String numeroConta, String agencia, double saldo, LocalDate dataCriacao,
+                         Usuario usuario, double limitedebito, double limitecredito) {
+
+        // Agora o super() recebe exatamente o que a classe Conta pede
+        super(id, numeroConta, agencia, saldo, dataCriacao, usuario);
+
         this.limitedebito = limitedebito;
         this.limitecredito = limitecredito;
     }
@@ -29,7 +32,7 @@ public class ContaCorrente extends Conta {
         double disponivel = this.saldo + this.limitedebito;
 
         if (valor > 0 && valor <= disponivel) {
-            this.saldo -= valor; // O saldo pode ficar negativo aqui, o que é normal em CC
+            this.saldo -= valor;
             System.out.println("--- Saque Realizado ---");
             System.out.println("Valor: R$ " + valor);
             System.out.println("Saldo Atual: R$ " + this.saldo);

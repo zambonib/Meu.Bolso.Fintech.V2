@@ -3,18 +3,23 @@ package br.com.fiap.meubolso.model;
 import java.time.LocalDate;
 
 public class ContaPoupanca extends Conta {
-    //CONSTRUTOR
+
+    // CONSTRUTOR PADRÃO
     public ContaPoupanca() {
         super();
     }
-    //CONSTRUTOR COM PARAMETRO
-    public ContaPoupanca(int id, String numeroConta, String agencia, double saldo, LocalDate dataCriacao) {
-        super(id, numeroConta, agencia, saldo, dataCriacao);
+
+    // CONSTRUTOR COM PARAMETROS (Corrigido para incluir o Usuario)
+    public ContaPoupanca(int id, String numeroConta, String agencia, double saldo, LocalDate dataCriacao, Usuario usuario) {
+        // Agora o super recebe o usuario para bater com a classe Conta
+        super(id, numeroConta, agencia, saldo, dataCriacao, usuario);
     }
-    //METODOS
+
+    // METODOS
     public void atualizarSaldo(double taxa) {
         this.saldo += this.saldo * (taxa / 100);
     }
+
     @Override
     public void sacar(double valor) {
         if (valor > 0 && valor <= this.saldo) {
