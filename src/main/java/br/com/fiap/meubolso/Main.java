@@ -1,12 +1,17 @@
 package br.com.fiap.meubolso;
 
 import br.com.fiap.meubolso.dao.UsuarioDAO;
-import br.com.fiap.meubolso.dao.ContaDAO; // Import novo
+import br.com.fiap.meubolso.dao.ContaDAO;
+import br.com.fiap.meubolso.dao.ReceitaDAO;
+import br.com.fiap.meubolso.dao.DespesaDAO;
 import br.com.fiap.meubolso.model.Conta;
-import br.com.fiap.meubolso.model.ContaCorrente; // Para instanciar a conta
+import br.com.fiap.meubolso.model.ContaCorrente;
 import br.com.fiap.meubolso.model.Usuario;
 import br.com.fiap.meubolso.model.UsuarioView;
+import br.com.fiap.meubolso.model.Receita;
+import br.com.fiap.meubolso.model.Despesa;
 
+import java.time.LocalDate;
 import java.util.Scanner;
 import java.util.List;
 
@@ -14,8 +19,11 @@ public class Main {
     public static void main(String[] args) {
         Scanner entrada = new Scanner(System.in);
 
+        // Inicialização dos DAOs
         UsuarioDAO usuarioDao = new UsuarioDAO();
-        ContaDAO contaDao = new ContaDAO(); // Instanciando o DAO de conta
+        ContaDAO contaDao = new ContaDAO();
+        ReceitaDAO receitaDao = new ReceitaDAO();
+        DespesaDAO despesaDao = new DespesaDAO();
 
         int escolha = -1;
 
@@ -27,6 +35,8 @@ public class Main {
             System.out.println("2 - Listar usuários do Banco");
             System.out.println("3 - Criar conta vinculada");
             System.out.println("4 - Realizar Saque");
+            System.out.println("5 - Testar Receitas (Cadastrar 5 e Listar)");
+            System.out.println("6 - Testar Despesas (Cadastrar 5 e Listar)");
             System.out.println("0 - Sair");
             System.out.print("Escolha sua opção: ");
 
@@ -55,7 +65,6 @@ public class Main {
                     System.out.print("Digite o ID do usuário dono da conta: ");
                     int idUser = entrada.nextInt();
 
-                    // Criando o objeto conta (Usando ContaCorrente como exemplo)
                     ContaCorrente novaConta = new ContaCorrente();
                     novaConta.setIdUsuario(idUser);
 
@@ -84,16 +93,60 @@ public class Main {
                         System.out.print("Valor do saque: ");
                         double valorSaque = entrada.nextDouble();
 
-                        // Busca a conta específica na lista (simplificado para o teste)
                         for (Conta c : contas) {
                             if (c.getId() == idConta) {
                                 c.sacar(valorSaque);
-                                contaDao.update(c); // ATUALIZA o saldo no banco!
+                                contaDao.update(c);
                                 break;
                             }
                         }
                     }
                     break;
+
+                case 5:
+                    System.out.println("\n--- TESTE DE RECEITAS (CADASTRO AUTOMÁTICO DE 5) ---");
+                    System.out.print("Informe o ID da Conta para vincular as receitas: ");
+                    int idContaReceita = entrada.nextInt();
+
+                    for (int i = 1; i <= 5; i++) {
+                        Receita r = new Receita();
+                        r.setIdConta(idContaReceita);
+                        r.setDescricao("Receita Automática " + i);
+                        r.setValor(500.0 * i);
+                        r.setData(LocalDate.now());
+                        receitaDao.insert(r);
+                    }
+
+                    System.out.println("\n--- LISTANDO TODAS AS RECEITAS ---");
+                    receitaDao.getAll().forEach(r ->
+                            System.out.println("ID: " + r.getId() + " | Desc: " + r.getDescricao() + " | Valor: R$ " + r.getValor()));
+                    break;
+
+                case 6:
+                    System.out.println("\n--- TESTE DE DESPESAS (CADASTRO AUTOMÁTICO DE 5) ---");
+                    System.out.print("Informe o ID da Conta para vincular as despesas: ");
+                    int idContaDespesa = entrada.nextInt();
+
+                    for (int i = 1; i <= 5; i++) {
+                        Despesa d = new Despesa();
+                        d.setIdConta(idContaDespesa);
+                        d.setDescricao("Despesa Automática " + i);
+                        d.setValor(100.0 * i);
+                        d.setData(LocalDate.now());
+                        despesaDao.insert(d);
+                    }
+
+                    System.out.println("\n--- LISTANDO TODAS AS DESPESAS ---");
+                    despesaDao.getAll().forEach(d ->
+                            System.out.println("ID: " + d.getId() + " | Desc: " + d.getDescricao() + " | Valor: R$ " + d.getValor()));
+                    break;
+
+                case 0:
+                    System.out.println("Encerrando o sistema...");
+                    break;
+
+                default:
+                    System.out.println("Opção inválida!");
             }
         }
         entrada.close();
