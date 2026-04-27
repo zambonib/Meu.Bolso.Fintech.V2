@@ -6,15 +6,10 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Classe DAO para gerir as operações de base de dados da entidade Usuário.
- * Implementa o CRUD completo e busca por ID.
- */
+
 public class UsuarioDAO {
 
-    /**
-     * CREATE - Insere um novo usuário
-     */
+
     public void insert(Usuario usuario) {
         String sql = "INSERT INTO T_USUARIO (CD_USUARIO, NM_USUARIO, DT_NASCIMENTO, NR_CPF, DS_EMAIL, NR_TELEFONE, DT_CADASTRO) " +
                 "VALUES (SQ_USUARIO.NEXTVAL, ?, ?, ?, ?, ?, ?)";
@@ -37,9 +32,6 @@ public class UsuarioDAO {
         }
     }
 
-    /**
-     * READ - Lista todos os usuários
-     */
     public List<Usuario> getAll() {
         List<Usuario> lista = new ArrayList<>();
         String sql = "SELECT * FROM T_USUARIO ORDER BY CD_USUARIO";
@@ -58,9 +50,7 @@ public class UsuarioDAO {
         return lista;
     }
 
-    /**
-     * READ - Busca um usuário específico pelo ID
-     */
+
     public Usuario getById(int id) {
         Usuario u = null;
         String sql = "SELECT * FROM T_USUARIO WHERE CD_USUARIO = ?";
@@ -80,9 +70,7 @@ public class UsuarioDAO {
         return u;
     }
 
-    /**
-     * UPDATE - Atualiza dados do usuário
-     */
+
     public void update(Usuario usuario) {
         String sql = "UPDATE T_USUARIO SET NM_USUARIO = ?, DS_EMAIL = ?, NR_TELEFONE = ? WHERE CD_USUARIO = ?";
 
@@ -102,9 +90,7 @@ public class UsuarioDAO {
         }
     }
 
-    /**
-     * DELETE - Remove um usuário
-     */
+
     public void delete(int id) {
         String sql = "DELETE FROM T_USUARIO WHERE CD_USUARIO = ?";
 
@@ -120,9 +106,8 @@ public class UsuarioDAO {
         }
     }
 
-    /**
-     * Método auxiliar para evitar repetição de código ao converter ResultSet em Objeto Usuario
-     */
+    //Método auxiliar para evitar repetição de código ao converter ResultSet em Objeto Usuario
+
     private Usuario mapearUsuario(ResultSet rs) throws SQLException {
         Usuario u = new Usuario();
         u.setId(rs.getInt("CD_USUARIO"));

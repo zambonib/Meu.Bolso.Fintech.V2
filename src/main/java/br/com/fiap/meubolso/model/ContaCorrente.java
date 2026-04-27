@@ -10,11 +10,10 @@ public class ContaCorrente extends Conta {
         super();
     }
 
-    // Construtor Corrigido para bater com a classe Conta
+    // Construtor
     public ContaCorrente(int id, String numeroConta, String agencia, double saldo, LocalDate dataCriacao,
                          Usuario usuario, double limitedebito, double limitecredito) {
 
-        // Agora o super() recebe exatamente o que a classe Conta pede
         super(id, numeroConta, agencia, saldo, dataCriacao, usuario);
 
         this.limitedebito = limitedebito;

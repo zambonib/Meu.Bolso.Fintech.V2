@@ -20,14 +20,11 @@ public class ContaView {
             System.out.print("Informe o Limite de Débito: ");
             double debito = Double.parseDouble(sc.nextLine());
 
-            // ATENÇÃO NA ORDEM: id, numero, agencia, saldo, data, usuario, limiteDebito, limiteCredito
-            // O saldo inicial será o valor do debito conforme você pediu
             return new ContaCorrente(0, numero, agencia, debito, LocalDate.now(), dono, debito, 0.0);
         } else {
             System.out.print("Valor do Depósito Inicial: ");
             double saldoInicial = Double.parseDouble(sc.nextLine());
 
-            // ATENÇÃO NA ORDEM: id, numero, agencia, saldo, data, usuario
             return new ContaPoupanca(0, numero, agencia, saldoInicial, LocalDate.now(), dono);
         }
     }

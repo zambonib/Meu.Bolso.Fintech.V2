@@ -9,7 +9,7 @@ public class ContaPoupanca extends Conta {
         super();
     }
 
-    // CONSTRUTOR COM PARAMETROS (Corrigido para incluir o Usuario)
+    // CONSTRUTOR COM PARAMETROS
     public ContaPoupanca(int id, String numeroConta, String agencia, double saldo, LocalDate dataCriacao, Usuario usuario) {
         // Agora o super recebe o usuario para bater com a classe Conta
         super(id, numeroConta, agencia, saldo, dataCriacao, usuario);

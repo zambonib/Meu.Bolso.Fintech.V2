@@ -9,14 +9,13 @@ import java.util.List;
 public class ReceitaDAO {
 
     public void insert(Receita receita) {
-        // SQL ajustado conforme seu print: CD_RECEITA, CD_CONTA, DS_RECEITA, VL_RECEITA, DT_RECEITA
         String sql = "INSERT INTO T_RECEITA (CD_RECEITA, CD_CONTA, DS_RECEITA, VL_RECEITA, DT_RECEITA) " +
                 "VALUES (SQ_RECEITA.NEXTVAL, ?, ?, ?, ?)";
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, receita.getIdConta()); // Referência à T_CONTA
+            ps.setInt(1, receita.getIdConta());
             ps.setString(2, receita.getDescricao());
             ps.setDouble(3, receita.getValor());
             ps.setDate(4, Date.valueOf(receita.getData()));

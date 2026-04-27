@@ -11,7 +11,7 @@ import java.util.List;
 public class ContaDAO {
 
     public void insert(Conta conta) {
-        // SQL completo incluindo os limites que aparecem no seu print do banco
+
         String sql = "INSERT INTO T_CONTA (CD_CONTA, CD_USUARIO, NR_CONTA, NR_AGENCIA, VL_SALDO, DT_CRIACAO, VL_LIMITE_DEBITO, VL_LIMITE_CREDITO) " +
                 "VALUES (SQ_CONTA.NEXTVAL, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -62,7 +62,7 @@ public class ContaDAO {
                 c.setAgencia(rs.getString("NR_AGENCIA"));
                 c.setSaldo(rs.getDouble("VL_SALDO"));
 
-                // Trata data nula vinda do banco para não quebrar o Java
+                // Trata data nula vinda do banco
                 Date dataSql = rs.getDate("DT_CRIACAO");
                 if (dataSql != null) {
                     c.setDataCriacao(dataSql.toLocalDate());
