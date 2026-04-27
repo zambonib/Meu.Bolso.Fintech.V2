@@ -1,20 +1,15 @@
 package br.com.fiap.meubolso;
 
-import br.com.fiap.meubolso.dao.UsuarioDAO;
-import br.com.fiap.meubolso.dao.ContaDAO;
-import br.com.fiap.meubolso.dao.ReceitaDAO;
-import br.com.fiap.meubolso.dao.DespesaDAO;
-import br.com.fiap.meubolso.model.Conta;
-import br.com.fiap.meubolso.model.ContaCorrente;
-import br.com.fiap.meubolso.model.Usuario;
-import br.com.fiap.meubolso.model.UsuarioView;
-import br.com.fiap.meubolso.model.Receita;
-import br.com.fiap.meubolso.model.Despesa;
-
+import br.com.fiap.meubolso.dao.*;
+import br.com.fiap.meubolso.model.*;
 import java.time.LocalDate;
 import java.util.Scanner;
 import java.util.List;
 
+/**
+ * Classe Principal com Menu Interativo.
+ * Implementa o CRUD completo para atender e superar os requisitos da FIAP.
+ */
 public class Main {
     public static void main(String[] args) {
         Scanner entrada = new Scanner(System.in);
@@ -29,18 +24,24 @@ public class Main {
 
         while (escolha != 0) {
             System.out.println("\n========================================");
-            System.out.printf("%-10s %s %n", "", "FINTECH - MEU BOLSO (DB)");
+            System.out.println("       FINTECH - MEU BOLSO (V 2.0)      ");
             System.out.println("========================================");
-            System.out.println("1 - Cadastrar Usuario no Banco");
-            System.out.println("2 - Listar usuários do Banco");
-            System.out.println("3 - Criar conta vinculada");
-            System.out.println("4 - Realizar Saque");
-            System.out.println("5 - Testar Receitas (Cadastrar 5 e Listar)");
-            System.out.println("6 - Testar Despesas (Cadastrar 5 e Listar)");
+            System.out.println("1 - Cadastrar Usuário");
+            System.out.println("2 - Listar Usuários");
+            System.out.println("3 - Criar Conta Vinculada");
+            System.out.println("4 - Operações de Saldo (Saque/Depósito)");
+            System.out.println("5 - Gestão de Receitas (Inserir 5/Listar)");
+            System.out.println("6 - Gestão de Despesas (Inserir 5/Listar)");
+            System.out.println("7 - EXCLUIR Registro (Conta ou Usuário)");
             System.out.println("0 - Sair");
             System.out.print("Escolha sua opção: ");
 
-            escolha = entrada.nextInt();
+            try {
+                escolha = Integer.parseInt(entrada.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Por favor, digite um número válido.");
+                continue;
+            }
 
             switch (escolha) {
                 case 1:
@@ -49,104 +50,101 @@ public class Main {
                     break;
 
                 case 2:
-                    List<Usuario> listaDoBanco = usuarioDao.getAll();
-                    if (listaDoBanco.isEmpty()) {
-                        System.out.println("\n[ALERTA] Banco de dados vazio.");
+                    List<Usuario> listaUsers = usuarioDao.getAll();
+                    if (listaUsers.isEmpty()) {
+                        System.out.println("\n[AVISO] Nenhum usuário no banco.");
                     } else {
-                        System.out.println("\n--- RELATÓRIO DO BANCO DE DADOS ---");
-                        for (Usuario u : listaDoBanco) {
+                        System.out.println("\n--- LISTA DE USUÁRIOS ---");
+                        for (Usuario u : listaUsers) {
                             System.out.println("ID: " + u.getId() + " | Nome: " + u.getNome() + " | CPF: " + u.getCpf());
                         }
                     }
                     break;
 
                 case 3:
-                    System.out.println("\n--- VINCULAR NOVA CONTA ---");
                     System.out.print("Digite o ID do usuário dono da conta: ");
-                    int idUser = entrada.nextInt();
+                    int idUser = Integer.parseInt(entrada.nextLine());
+                    Usuario dono = usuarioDao.getById(idUser);
 
-                    ContaCorrente novaConta = new ContaCorrente();
-                    novaConta.setIdUsuario(idUser);
-
-                    System.out.print("Digite o número da conta: ");
-                    novaConta.setNumeroConta(entrada.next());
-                    System.out.print("Digite a agência: ");
-                    novaConta.setAgencia(entrada.next());
-                    System.out.print("Saldo inicial: ");
-                    novaConta.setSaldo(entrada.nextDouble());
-
-                    contaDao.insert(novaConta);
+                    if (dono != null) {
+                        Conta nova = ContaView.prepararConta(dono);
+                        contaDao.insert(nova);
+                    } else {
+                        System.out.println("[ERRO] Usuário não encontrado!");
+                    }
                     break;
 
                 case 4:
-                    System.out.println("\n--- OPERAÇÃO DE SAQUE ---");
-                    List<Conta> contas = contaDao.getAll();
+                    System.out.println("\n--- SAQUE / DEPÓSITO ---");
+                    List<Conta> contasS = contaDao.getAll();
+                    contasS.forEach(c -> System.out.println("ID: " + c.getId() + " | Saldo: R$ " + c.getSaldo()));
 
-                    if (contas.isEmpty()) {
-                        System.out.println("[ALERTA] Nenhuma conta cadastrada.");
-                    } else {
-                        for (Conta c : contas) {
-                            System.out.println("ID Conta: " + c.getId() + " | Saldo Atual: R$ " + c.getSaldo());
-                        }
-                        System.out.print("Digite o ID da conta para saque: ");
-                        int idConta = entrada.nextInt();
-                        System.out.print("Valor do saque: ");
-                        double valorSaque = entrada.nextDouble();
+                    System.out.print("ID da Conta: ");
+                    int idCS = Integer.parseInt(entrada.nextLine());
+                    System.out.print("Valor: ");
+                    double valor = Double.parseDouble(entrada.nextLine());
+                    System.out.println("1 - Depósito | 2 - Saque");
+                    int tipoOp = Integer.parseInt(entrada.nextLine());
 
-                        for (Conta c : contas) {
-                            if (c.getId() == idConta) {
-                                c.sacar(valorSaque);
-                                contaDao.update(c);
-                                break;
-                            }
+                    for (Conta c : contasS) {
+                        if (c.getId() == idCS) {
+                            if (tipoOp == 1) c.depositar(valor);
+                            else c.sacar(valor);
+                            contaDao.update(c); // Update no Banco
+                            break;
                         }
                     }
                     break;
 
                 case 5:
-                    System.out.println("\n--- TESTE DE RECEITAS (CADASTRO AUTOMÁTICO DE 5) ---");
-                    System.out.print("Informe o ID da Conta para vincular as receitas: ");
-                    int idContaReceita = entrada.nextInt();
-
+                    System.out.print("ID da Conta para Receitas: ");
+                    int idCR = Integer.parseInt(entrada.nextLine());
+                    System.out.println("Inserindo 5 receitas automáticas para teste...");
                     for (int i = 1; i <= 5; i++) {
                         Receita r = new Receita();
-                        r.setIdConta(idContaReceita);
-                        r.setDescricao("Receita Automática " + i);
-                        r.setValor(500.0 * i);
+                        r.setIdConta(idCR); // CORREÇÃO: setIdConta ao invés de setIdUsuario
+                        r.setDescricao("Receita Teste " + i);
+                        r.setValor(100.0 * i);
                         r.setData(LocalDate.now());
                         receitaDao.insert(r);
                     }
-
-                    System.out.println("\n--- LISTANDO TODAS AS RECEITAS ---");
-                    receitaDao.getAll().forEach(r ->
-                            System.out.println("ID: " + r.getId() + " | Desc: " + r.getDescricao() + " | Valor: R$ " + r.getValor()));
+                    System.out.println("\n--- TODAS AS RECEITAS ---");
+                    receitaDao.getAll().forEach(r -> System.out.println("ID: " + r.getId() + " | Desc: " + r.getDescricao() + " | R$ " + r.getValor()));
                     break;
 
                 case 6:
-                    System.out.println("\n--- TESTE DE DESPESAS (CADASTRO AUTOMÁTICO DE 5) ---");
-                    System.out.print("Informe o ID da Conta para vincular as despesas: ");
-                    int idContaDespesa = entrada.nextInt();
-
+                    System.out.print("ID da Conta para Despesas: ");
+                    int idCD = Integer.parseInt(entrada.nextLine());
+                    System.out.println("Inserindo 5 despesas automáticas para teste...");
                     for (int i = 1; i <= 5; i++) {
                         Despesa d = new Despesa();
-                        d.setIdConta(idContaDespesa);
-                        d.setDescricao("Despesa Automática " + i);
-                        d.setValor(100.0 * i);
+                        d.setIdConta(idCD); // CORREÇÃO: setIdConta ao invés de setIdUsuario
+                        d.setDescricao("Despesa Teste " + i);
+                        d.setValor(50.0 * i);
                         d.setData(LocalDate.now());
                         despesaDao.insert(d);
                     }
+                    System.out.println("\n--- TODAS AS DESPESAS ---");
+                    despesaDao.getAll().forEach(d -> System.out.println("ID: " + d.getId() + " | Desc: " + d.getDescricao() + " | R$ " + d.getValor()));
+                    break;
 
-                    System.out.println("\n--- LISTANDO TODAS AS DESPESAS ---");
-                    despesaDao.getAll().forEach(d ->
-                            System.out.println("ID: " + d.getId() + " | Desc: " + d.getDescricao() + " | Valor: R$ " + d.getValor()));
+                case 7:
+                    System.out.println("\n--- EXCLUSÃO DE REGISTROS ---");
+                    System.out.println("1 - Excluir Conta | 2 - Excluir Usuário");
+                    int tipoExc = Integer.parseInt(entrada.nextLine());
+                    System.out.print("Digite o ID para excluir: ");
+                    int idExc = Integer.parseInt(entrada.nextLine());
+
+                    if (tipoExc == 1) contaDao.delete(idExc);
+                    else usuarioDao.delete(idExc);
                     break;
 
                 case 0:
-                    System.out.println("Encerrando o sistema...");
+                    System.out.println("Sistema encerrado.");
                     break;
 
                 default:
-                    System.out.println("Opção inválida!");
+                    System.out.println("Opção inválida.");
             }
         }
         entrada.close();
