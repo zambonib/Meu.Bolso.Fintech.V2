@@ -1,11 +1,15 @@
 package br.com.fiap.meubolso.dao;
 
 import br.com.fiap.meubolso.factory.ConnectionFactory;
-import br.com.fiap.meubolso.model.Usuario; // Verifique se o pacote está correto
+import br.com.fiap.meubolso.model.Usuario;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Classe DAO para gerir as operações de base de dados da entidade Usuário.
+ * Implementa o CRUD completo e busca por ID.
+ */
 public class UsuarioDAO {
 
     /**
@@ -19,7 +23,7 @@ public class UsuarioDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, usuario.getNome());
-            ps.setDate(2, Date.valueOf(usuario.getDataNascimento())); // Converte LocalDate para java.sql.Date
+            ps.setDate(2, Date.valueOf(usuario.getDataNascimento()));
             ps.setString(3, usuario.getCpf());
             ps.setString(4, usuario.getEmail());
             ps.setString(5, usuario.getTelefone());
@@ -34,7 +38,7 @@ public class UsuarioDAO {
     }
 
     /**
-     * READ - Lista todos os usuários (Exigência do Capítulo 2)
+     * READ - Lista todos os usuários
      */
     public List<Usuario> getAll() {
         List<Usuario> lista = new ArrayList<>();
@@ -45,21 +49,35 @@ public class UsuarioDAO {
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                Usuario u = new Usuario();
-                u.setId(rs.getInt("CD_USUARIO"));
-                u.setNome(rs.getString("NM_USUARIO"));
-                u.setDataNascimento(rs.getDate("DT_NASCIMENTO").toLocalDate());
-                u.setCpf(rs.getString("NR_CPF"));
-                u.setEmail(rs.getString("DS_EMAIL"));
-                u.setTelefone(rs.getString("NR_TELEFONE"));
-                u.setDataCadastro(rs.getDate("DT_CADASTRO").toLocalDate());
-
+                Usuario u = mapearUsuario(rs);
                 lista.add(u);
             }
         } catch (SQLException e) {
             System.err.println("Erro ao listar usuários: " + e.getMessage());
         }
         return lista;
+    }
+
+    /**
+     * READ - Busca um usuário específico pelo ID
+     */
+    public Usuario getById(int id) {
+        Usuario u = null;
+        String sql = "SELECT * FROM T_USUARIO WHERE CD_USUARIO = ?";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    u = mapearUsuario(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar usuário por ID: " + e.getMessage());
+        }
+        return u;
     }
 
     /**
@@ -100,5 +118,20 @@ public class UsuarioDAO {
         } catch (SQLException e) {
             System.err.println("Erro ao excluir usuário: " + e.getMessage());
         }
+    }
+
+    /**
+     * Método auxiliar para evitar repetição de código ao converter ResultSet em Objeto Usuario
+     */
+    private Usuario mapearUsuario(ResultSet rs) throws SQLException {
+        Usuario u = new Usuario();
+        u.setId(rs.getInt("CD_USUARIO"));
+        u.setNome(rs.getString("NM_USUARIO"));
+        u.setDataNascimento(rs.getDate("DT_NASCIMENTO").toLocalDate());
+        u.setCpf(rs.getString("NR_CPF"));
+        u.setEmail(rs.getString("DS_EMAIL"));
+        u.setTelefone(rs.getString("NR_TELEFONE"));
+        u.setDataCadastro(rs.getDate("DT_CADASTRO").toLocalDate());
+        return u;
     }
 }
